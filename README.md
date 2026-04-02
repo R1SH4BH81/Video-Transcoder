@@ -48,3 +48,10 @@ The heart of the asynchronous processing. When a video is uploaded:
 3. Configure `.env` in the `backend/` folder (see `.env.example`).
 4. Run `npx prisma db push` to setup the database.
 5. Start both servers using `npm run dev`.
+
+## ScreenShots
+<img width="814" height="792" alt="image" src="https://github.com/user-attachments/assets/21949cd8-ec40-4b5d-959a-2c9d28311266" />
+
+<img width="789" height="861" alt="image" src="https://github.com/user-attachments/assets/f36eaead-c53f-4045-8e71-8f91e04c7623" />
+<img width="1777" height="342" alt="image" src="https://github.com/user-attachments/assets/3260a143-d0ce-41e2-9940-b96c336f5daa" />
+
