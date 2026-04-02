@@ -113,19 +113,10 @@ function App() {
         {/* Modal Header */}
         <div className="px-8 py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400">
-              <ChevronLeft className="w-6 h-6" />
-            </button>
+            
             <h1 className="text-xl font-bold text-gray-800">Upload New Video</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400">
-              <MoreHorizontal className="w-6 h-6" />
-            </button>
-            <button className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-gray-500">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+         
         </div>
 
         {/* Modal Content */}
@@ -184,7 +175,7 @@ function App() {
                       Browse
                     </button>
 
-                    <p className="text-xs font-bold text-gray-400 mt-2">Maximum Size: 10Gb</p>
+                    <p className="text-xs font-bold text-gray-400 mt-2">Maximum Size: 2Gb</p>
                   </label>
                 </div>
 

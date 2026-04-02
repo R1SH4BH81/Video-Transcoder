@@ -28,6 +28,9 @@ export const uploadRateLimiter = rateLimit({
   limit: 5,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: {
+    singleCount: false,
+  },
   store: new RedisStore({
     // @ts-expect-error - ioredis and rate-limit-redis types mismatch but compatible
     sendCommand: (...args: string[]) => redisClient.call(...args),
