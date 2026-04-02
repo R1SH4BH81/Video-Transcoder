@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Status {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Video {
+  id          String   @id @default(uuid())
+  email       String
+  filename    String?  // Original filename
+  status      Status   @default(PENDING)
+  resolutions Json?    // { "360p": "url", "480p": "url", "720p": "url", "1080p": "url", "2k": "url", "4k": "url" }
+  createdAt   DateTime @default(now())
+}
