@@ -37,7 +37,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 // ---------------------------
+app.get('/', (req, res) => {
+  res.json({ message: "Backend is running successfully!" });
+});
 
+app.get('/api', (req, res) => {
+  res.json({ message: "API endpoint is reachable" });
+});
 app.use(express.json({ limit: '2gb' }));
 app.use(express.urlencoded({ limit: '2gb', extended: true }));
 
