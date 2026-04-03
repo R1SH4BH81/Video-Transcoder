@@ -28,6 +28,7 @@ app.use(globalRateLimiter);
 // --- DYNAMIC CORS CONFIG ---
 const corsOptions = {
   // Pulls from .env, defaults to '*' only if .env is missing (not recommended for prod)
+  //test 
   origin: process.env.FRONTEND_URL, 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
