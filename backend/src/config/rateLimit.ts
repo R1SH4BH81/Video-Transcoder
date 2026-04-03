@@ -25,7 +25,7 @@ export const globalRateLimiter = rateLimit({
 // Strict rate limiter for uploads: 5 uploads per hour per IP
 export const uploadRateLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  limit: 5,
+  limit: 50,
   standardHeaders: true,
   legacyHeaders: false,
   validate: {

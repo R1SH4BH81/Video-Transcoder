@@ -32,9 +32,10 @@ jobs:
             # 3. Pull latest changes
             git pull origin main
 
-            # 4. Install and Build
+            # 4. Install, Sync and Build
             npm install
             npx prisma generate
+            npx prisma db push
             npm run build
 
             # 5. Restart with PM2

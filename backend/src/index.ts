@@ -4,7 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { initSocket } from './config/socket';
 import videoRoutes from './routes/video';
-import { globalRateLimiter } from './config/rateLimit';
+// import { globalRateLimiter } from './config/rateLimit';
 import fs from 'fs';
 import path from 'path';
 import './workers/transcode'; 
@@ -23,7 +23,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.set('trust proxy', 1);
-app.use(globalRateLimiter);
+// app.use(globalRateLimiter);
 
 // --- DYNAMIC CORS CONFIG ---
 const corsOptions = {
