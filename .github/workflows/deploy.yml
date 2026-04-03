@@ -1,0 +1,42 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Oracle Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # 1. Load Node/NPM environment
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # 2. Navigate to backend
+            cd /var/www/Video-Transcoder/backend
+
+            # 3. Pull latest changes
+            git pull origin main
+
+            # 4. Install and Build
+            npm install
+            npx prisma generate
+            npm run build
+
+            # 5. Restart with PM2
+            # This ensures the process named 'video-backend' is updated
+            pm2 restart video-backend || pm2 start dist/index.js --name "video-backend"
