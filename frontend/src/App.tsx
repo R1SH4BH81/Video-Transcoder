@@ -7,9 +7,7 @@ import {
   Loader2, 
   Play, 
   Mail, 
-  ChevronLeft, 
-  X, 
-  MoreHorizontal, 
+  
   FolderClosed, 
   FolderPlus 
 } from 'lucide-react';

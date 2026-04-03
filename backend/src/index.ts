@@ -7,8 +7,8 @@ import videoRoutes from './routes/video';
 import { globalRateLimiter } from './config/rateLimit';
 import fs from 'fs';
 import path from 'path';
-import './workers/transcode'; // Import to start the worker
-import './workers/email';     // Import to start the worker
+import './workers/transcode'; 
+import './workers/email';     
 
 dotenv.config();
 
@@ -22,9 +22,21 @@ if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 const app = express();
 const server = http.createServer(app);
 
-app.set('trust proxy', 1); // Trust the first proxy (needed for accurate IP rate limiting)
+app.set('trust proxy', 1);
 app.use(globalRateLimiter);
-app.use(cors());
+
+// --- DYNAMIC CORS CONFIG ---
+const corsOptions = {
+  // Pulls from .env, defaults to '*' only if .env is missing (not recommended for prod)
+  origin: process.env.FRONTEND_URL, 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+// ---------------------------
+
 app.use(express.json({ limit: '2gb' }));
 app.use(express.urlencoded({ limit: '2gb', extended: true }));
 
@@ -34,8 +46,10 @@ app.use('/api/video', videoRoutes);
 // Socket.io initialization
 initSocket(server);
 
-const PORT = process.env.PORT || 5000;
+// Pulls PORT from .env
+const PORT = process.env.PORT || 5609;
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`CORS allowed for: ${process.env.FRONTEND_URL}`);
 });
