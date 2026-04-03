@@ -3,6 +3,9 @@ import axios from 'axios';
 import { socket } from './socket';
 import { AnimatePresence, motion } from 'framer-motion';
 
+
+import { getStatusMessage } from './utils/statusHelper';
+
 // Components
 import UploadSection from './components/UploadSection';
 import ProcessingSection from './components/ProcessingSection';
@@ -83,7 +86,7 @@ function App() {
 
     setIsUploading(true);
     addToast('info', 'Starting Upload', 'Your video is being sent to the server...');
-    
+
     const formData = new FormData();
     formData.append('video', file);
     formData.append('email', email);
@@ -103,20 +106,6 @@ function App() {
     }
   };
 
-  const getStatusMessage = (status: string) => {
-    switch (status) {
-      case 'PENDING': return 'Queued for processing...';
-      case 'UPLOADING_TO_CDN': return 'Uploading to CDN...';
-      case 'PROCESSING': return 'Initializing transcoding...';
-      case 'TRANSCODING_360p': return 'Transcoding to 360p...';
-      case 'TRANSCODING_480p': return 'Transcoding to 480p...';
-      case 'TRANSCODING_720p': return 'Transcoding to 720p...';
-      case 'COMPLETED': return 'Transcoding complete!';
-      case 'FAILED': return 'Processing failed.';
-      default: return 'Processing...';
-    }
-  };
-
   const resetProcess = () => {
     setProcessId(null);
     setFile(null);
@@ -128,8 +117,8 @@ function App() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#F8F9FA] font-sans">
       <Toaster toasts={toasts} onRemove={removeToast} />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-2xl bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden border border-gray-100"

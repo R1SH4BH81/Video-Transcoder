@@ -4,11 +4,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { initSocket } from './config/socket';
 import videoRoutes from './routes/video';
-// import { globalRateLimiter } from './config/rateLimit';
+import { globalRateLimiter } from './config/rateLimit';
 import fs from 'fs';
 import path from 'path';
-import './workers/transcode'; 
-import './workers/email';     
+import './workers/transcode';
+import './workers/email';
 
 dotenv.config();
 
@@ -23,13 +23,13 @@ const app = express();
 const server = http.createServer(app);
 
 app.set('trust proxy', 1);
-// app.use(globalRateLimiter);
+app.use(globalRateLimiter);
 
 // --- DYNAMIC CORS CONFIG ---
 const corsOptions = {
   // Pulls from .env, defaults to '*' only if .env is missing (not recommended for prod)
   //test 
-  origin: process.env.FRONTEND_URL, 
+  origin: process.env.FRONTEND_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
