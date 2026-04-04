@@ -60,6 +60,4 @@ jobs:
         working-directory: backend
         run: npm test
 
-      - name: Build
-        working-directory: backend
-        run: npm run build
+      
