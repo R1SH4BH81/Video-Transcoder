@@ -8,13 +8,18 @@ import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import fs from 'fs';
 
-if (ffmpegStatic) {
-  ffmpeg.setFfmpegPath(ffmpegStatic);
-}
-ffmpeg.setFfprobePath(ffprobeStatic.path);
 import path from 'path';
 import axios from 'axios';
 import { Queue } from 'bullmq';
+
+import { getFfmpegPath, getFfprobePath } from '../utils/ffmpeg-paths';
+
+ffmpeg.setFfmpegPath(getFfmpegPath());
+ffmpeg.setFfprobePath(getFfprobePath());
+
+console.log(`[FFMPEG] Path: ${getFfmpegPath()}`);
+console.log(`[FFPROBE] Path: ${getFfprobePath()}`);
+// -------------------------------
 
 const emailQueue = new Queue('email-notification', { connection: redisConnection });
 

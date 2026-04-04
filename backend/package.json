@@ -8,7 +8,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -46,6 +47,7 @@
     "@types/nodemailer": "^7.0.11",
     "@types/pg": "^8.20.0",
     "ts-node-dev": "^2.0.0",
-    "tsc-alias": "^1.8.16"
+    "tsc-alias": "^1.8.16",
+    "vitest": "^4.1.2"
   }
 }

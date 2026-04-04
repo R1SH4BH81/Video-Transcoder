@@ -122,24 +122,24 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6 bg-bg-main font-sans selection:bg-brand-cyan/30">
+    <main className="min-h-screen flex items-center justify-center p-3 sm:p-6 bg-bg-main font-sans selection:bg-brand-cyan/30">
       <Toaster toasts={toasts} onRemove={removeToast} />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-2xl bg-surface rounded-[3rem] shadow-premium overflow-hidden border border-white/5 relative"
+        className="w-full max-w-2xl bg-surface rounded-2xl sm:rounded-[3rem] shadow-premium overflow-hidden border border-white/5 relative"
       >
         {/* Subtle Gradient Glow */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-cyan/10 rounded-full blur-[100px] pointer-events-none" />
         
-        <div className="px-10 py-8 flex items-center justify-between relative z-10">
+        <div className="px-5 py-5 sm:px-10 sm:py-8 flex items-center justify-between relative z-10">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-black tracking-tight text-white/90">
+            <h1 className="text-lg font-medium sm:text-2xl sm:font-black tracking-tight text-white/90">
               {processId ? 'Processing' : 'Transcoder'}
             </h1>
-            <p className="text-xs font-bold text-text-dim uppercase tracking-[0.2em]">
+            <p className="text-xs font-medium sm:text-sm sm:font-bold text-text-dim uppercase tracking-widest">
               {processId ? 'High Resolution Queue' : 'Upload Studio'}
             </p>
           </div>
@@ -154,7 +154,7 @@ function App() {
           )}
         </div>
 
-        <div className="px-10 pb-12 relative z-10">
+        <div className="px-5 pb-6 sm:px-10 sm:pb-12 relative z-10">
           <AnimatePresence mode="wait">
             {!processId ? (
               <UploadSection
