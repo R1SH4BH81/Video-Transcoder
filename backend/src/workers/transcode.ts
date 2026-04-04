@@ -5,11 +5,13 @@ import cloudinary from '../config/cloudinary';
 import { getIO } from '../config/socket';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegStatic from 'ffmpeg-static';
+import ffprobeStatic from 'ffprobe-static';
 import fs from 'fs';
 
 if (ffmpegStatic) {
   ffmpeg.setFfmpegPath(ffmpegStatic);
 }
+ffmpeg.setFfprobePath(ffprobeStatic.path);
 import path from 'path';
 import axios from 'axios';
 import { Queue } from 'bullmq';
@@ -86,7 +88,7 @@ const transcodeVideo = async (job: Job) => {
         ffmpeg(inputPath)
           .size(`${res.width}x${res.height}`)
           .on('progress', (progress) => {
-            const overallProgress = (i / targetResolutions.length) * 100 + (progress.percent / targetResolutions.length);
+            const overallProgress = (i / targetResolutions.length) * 100 + ((progress.percent ?? 0) / targetResolutions.length);
             io.to(videoId).emit('status', {
               status: `TRANSCODING_${res.name}`,
               progress: Math.floor(overallProgress),
