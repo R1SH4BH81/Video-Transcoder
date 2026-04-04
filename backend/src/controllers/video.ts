@@ -9,6 +9,100 @@ import path from 'path';
 
 const transcodeQueue = new Queue('video-transcode', { connection: redisConnection });
 
+export const uploadVideoChunk = async (req: Request, res: Response) => {
+  const file = req.file;
+  const { email, chunkIndex, totalChunks, processId, originalName } = req.body;
+
+  if (!file) return res.status(400).json({ error: 'No file uploaded' });
+
+  try {
+    let video;
+    let currentProcessId = processId;
+
+    if (chunkIndex === '0') {
+      if (!email) return res.status(400).json({ error: 'Email is required on first chunk' });
+      video = await prisma.video.create({
+        data: {
+          email,
+          filename: originalName || path.parse(file.originalname).name,
+          status: 'PENDING',
+        },
+      });
+      currentProcessId = video.id;
+      // create empty temp file
+      fs.writeFileSync(path.join(process.cwd(), 'uploads', `${currentProcessId}.tmp`), '');
+    } else {
+      if (!currentProcessId) return res.status(400).json({ error: 'processId required for subsequent chunks' });
+      video = await prisma.video.findUnique({ where: { id: currentProcessId } });
+      if (!video) throw new Error('Video not found');
+    }
+
+    const tempFilePath = path.join(process.cwd(), 'uploads', `${currentProcessId}.tmp`);
+    
+    // Append the current chunk to the temp file
+    const fileBuffer = fs.readFileSync(file.path);
+    fs.appendFileSync(tempFilePath, fileBuffer);
+    
+    // Clean up the small chunk upload handled by multer
+    fs.unlinkSync(file.path);
+
+    if (parseInt(chunkIndex) === parseInt(totalChunks) - 1) {
+      // Last chunk! Move to Cloudinary
+      const io = getIO();
+      io.to(currentProcessId).emit('status', { status: 'UPLOADING_TO_CDN', progress: 50 });
+
+      const result: any = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_large(tempFilePath, {
+          resource_type: 'video',
+          public_id: `raw/${currentProcessId}`,
+          chunk_size: 6000000, // 6MB chunks to cloudinary
+          timeout: 1800000,
+        }, (error, result) => {
+          if (error) {
+            console.error('Cloudinary Upload Error:', error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        });
+      });
+
+      // Cleanup large temp file
+      fs.unlinkSync(tempFilePath);
+
+      // Update status to PROCESSING
+      await prisma.video.update({
+        where: { id: currentProcessId },
+        data: { status: 'PROCESSING' },
+      });
+
+      io.to(currentProcessId).emit('status', { status: 'PROCESSING', progress: 50 });
+
+      // Add to transcoding queue
+      await transcodeQueue.add('transcode', {
+        videoId: currentProcessId,
+        cloudinaryUrl: result.secure_url,
+        publicId: result.public_id,
+        email: video.email,
+      }, {
+        attempts: 2,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        }
+      });
+    }
+
+    return res.json({ id: currentProcessId });
+  } catch (error) {
+    console.error('Upload Chunk Error:', error);
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+    return res.status(500).json({ error: 'Failed to upload video chunk' });
+  }
+};
+
 export const uploadVideo = async (req: Request, res: Response) => {
   const file = req.file;
   const email = req.body.email;
@@ -96,7 +190,7 @@ export const uploadVideo = async (req: Request, res: Response) => {
 };
 
 export const getVideoStatus = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   try {
     const video = await prisma.video.findUnique({
@@ -108,7 +202,7 @@ export const getVideoStatus = async (req: Request, res: Response) => {
     }
 
     // Generate signed URLs if completed
-    let signedResolutions = null;
+    let signedResolutions: Record<string, string> | null = null;
     if (video.status === 'COMPLETED' && video.resolutions) {
       const resolutions = video.resolutions as any;
       signedResolutions = {};

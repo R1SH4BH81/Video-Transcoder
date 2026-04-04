@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { uploadVideo, getVideoStatus, cloudinaryWebhook } from '../controllers/video';
+import { uploadVideo, uploadVideoChunk, getVideoStatus, cloudinaryWebhook } from '../controllers/video';
 // import { uploadRateLimiter } from '../config/rateLimit';
 
 import path from 'path';
@@ -14,6 +14,7 @@ const upload = multer({
 });
 
 router.post('/upload', upload.single('video'), uploadVideo);
+router.post('/upload-chunk', upload.single('video'), uploadVideoChunk);
 router.get('/status/:id', getVideoStatus);
 router.post('/webhook', cloudinaryWebhook);
 
