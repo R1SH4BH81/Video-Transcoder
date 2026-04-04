@@ -9,6 +9,7 @@ import { getStatusMessage } from './utils/statusHelper';
 // Components
 import UploadSection from './components/UploadSection';
 import ProcessingSection from './components/ProcessingSection';
+import type { VideoData } from './components/ProcessingSection';
 import Toaster from './components/Toaster';
 import type { ToastData } from './components/Toaster';
 import type { ToastType } from './components/Toast';
@@ -21,7 +22,7 @@ function App() {
   const [processId, setProcessId] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('IDLE');
   const [progress, setProgress] = useState(0);
-  const [videoData, setVideoData] = useState<any>(null);
+  const [videoData, setVideoData] = useState<VideoData | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
@@ -96,10 +97,16 @@ function App() {
       setProcessId(res.data.id);
       window.history.pushState({}, '', `?processId=${res.data.id}`);
       addToast('success', 'Upload Successful', 'Video processing has started.');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Upload Error:', err);
-      const errorMessage = err.response?.data?.error || 'Upload failed';
-      const toastType = err.response?.status === 429 ? 'warning' : 'error';
+      let errorMessage = 'Upload failed';
+      let toastType: ToastType = 'error';
+
+      if (axios.isAxiosError(err)) {
+        errorMessage = err.response?.data?.error || errorMessage;
+        toastType = err.response?.status === 429 ? 'warning' : 'error';
+      }
+      
       addToast(toastType, toastType === 'warning' ? 'Rate Limit Hit' : 'Upload Error', errorMessage);
     } finally {
       setIsUploading(false);
@@ -115,23 +122,39 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#F8F9FA] font-sans">
+    <main className="min-h-screen flex items-center justify-center p-6 bg-bg-main font-sans selection:bg-brand-cyan/30">
       <Toaster toasts={toasts} onRemove={removeToast} />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden border border-gray-100"
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-2xl bg-surface rounded-[3rem] shadow-premium overflow-hidden border border-white/5 relative"
       >
-        <div className="px-8 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-gray-800">
-              {processId ? 'Processing Video' : 'Upload New Video'}
+        {/* Subtle Gradient Glow */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-cyan/10 rounded-full blur-[100px] pointer-events-none" />
+        
+        <div className="px-10 py-8 flex items-center justify-between relative z-10">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-black tracking-tight text-white/90">
+              {processId ? 'Processing' : 'Transcoder'}
             </h1>
+            <p className="text-xs font-bold text-text-dim uppercase tracking-[0.2em]">
+              {processId ? 'High Resolution Queue' : 'Upload Studio'}
+            </p>
           </div>
+          
+          {processId && (
+            <button 
+              onClick={resetProcess}
+              className="text-xs font-bold text-text-dim hover:text-white transition-colors uppercase tracking-wider px-4 py-2 rounded-full bg-white/5 border border-white/5"
+            >
+              New Job
+            </button>
+          )}
         </div>
 
-        <div className="px-8 pb-10">
+        <div className="px-10 pb-12 relative z-10">
           <AnimatePresence mode="wait">
             {!processId ? (
               <UploadSection
@@ -154,7 +177,7 @@ function App() {
           </AnimatePresence>
         </div>
       </motion.div>
-    </div>
+    </main>
   );
 }
 
