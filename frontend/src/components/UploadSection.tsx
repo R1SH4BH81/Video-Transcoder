@@ -1,5 +1,5 @@
 import React from 'react';
-import { FolderClosed, FolderPlus, Mail, Loader2, Upload } from 'lucide-react';
+import { FolderClosed, Mail, Loader2, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface UploadSectionProps {
@@ -27,7 +27,6 @@ const UploadSection: React.FC<UploadSectionProps> = ({
       exit={{ opacity: 0 }}
       className="space-y-6"
     >
-      {/* Dashed Drop Zone */}
       <div className="relative group">
         <input
           type="file"
@@ -38,78 +37,60 @@ const UploadSection: React.FC<UploadSectionProps> = ({
         />
         <label
           htmlFor="video-upload"
-          className={`flex flex-col items-center justify-center gap-4 w-full aspect-[4/2.5] rounded-[2rem] border-2 border-dashed transition-all cursor-pointer ${
-            file ? 'bg-blue-50/30 border-blue-400 shadow-inner' : 'bg-white border-gray-200 hover:border-gray-300'
+          className={`flex flex-col items-center justify-center gap-5 w-full aspect-[4/2.5] rounded-[2rem] border transition-all cursor-pointer ${
+            file 
+              ? 'bg-brand-cyan/5 border-brand-cyan/30 text-brand-cyan' 
+              : 'bg-white/5 border-white/10 hover:border-white/20 text-text-dim'
           }`}
         >
-          <div className="relative">
-            <div className="p-4 bg-blue-500/10 rounded-2xl">
-              <FolderClosed className="w-10 h-10 text-blue-600" />
-            </div>
-            {file && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 rounded-full border-2 border-white" />
-            )}
+          <div className={`p-4 rounded-2xl transition-colors ${file ? 'bg-brand-cyan/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+            <FolderClosed className="w-8 h-8" />
           </div>
           
-          <div className="text-center space-y-1">
-            <p className="text-lg font-bold text-gray-800">
-              {file ? file.name : 'Drag & Drop a file here'}
+          <div className="text-center space-y-2">
+            <p className={`text-lg font-medium tracking-tight ${file ? 'text-white' : 'text-white/80'}`}>
+              {file ? file.name : 'Select a video file'}
             </p>
-            <p className="text-sm font-medium text-gray-400">
-              Files Supported: MP4, AVI, MOV
+            <p className="text-sm font-medium opacity-60">
+              MP4, AVI, MOV up to 2GB
             </p>
           </div>
-
-          <button 
-            type="button"
-            className="px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 mt-2"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('video-upload')?.click();
-            }}
-          >
-            <FolderPlus className="w-5 h-5" />
-            Browse
-          </button>
-
-          <p className="text-xs font-bold text-gray-400 mt-2">Maximum Size: 2Gb</p>
         </label>
       </div>
 
-      {/* Email Field & Upload Button */}
       <div className="space-y-4 pt-2">
         <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+            <Mail className="h-5 w-5 text-white/40 group-focus-within:text-brand-cyan transition-colors" />
           </div>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
-            placeholder="Enter your email to receive the results"
-            className="block w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-400 transition-all font-medium"
+            placeholder="Notification email address"
+            className="block w-full pl-14 pr-5 py-5 bg-surface-brighter border border-white/5 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:border-brand-cyan/50 focus:ring-1 focus:ring-brand-cyan/50 transition-all font-medium"
           />
         </div>
 
         <button
           onClick={onUpload}
           disabled={isUploading || !file || !email}
-          className={`w-full py-5 rounded-[1.5rem] font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl ${
+          className={`w-full py-5 rounded-[1.5rem] font-bold text-lg tracking-wide transition-all flex items-center justify-center gap-3 ${
             isUploading || !file || !email
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
-              : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20 active:scale-[0.98]'
+              ? 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+              : 'bg-brand-cyan text-surface hover:bg-brand-cyan/90 border border-brand-cyan/50'
           }`}
         >
           {isUploading ? (
             <>
-              <Loader2 className="w-6 h-6 animate-spin" />
-              <span>Uploading...</span>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Initializing...</span>
             </>
           ) : (
             <>
-              <Upload className="w-6 h-6" />
-              <span>Start Processing</span>
+              <Upload className="w-5 h-5" />
+              <span>Transcode Video</span>
             </>
           )}
         </button>
